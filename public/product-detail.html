@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ürün Detayı</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .product-detail {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .image-section {
+            flex: 1;
+            min-width: 400px;
+            position: relative;
+            background: #f7f7f7;
+        }
+
+        .main-image {
+            width: 100%;
+            height: 500px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.3s ease;
+        }
+
+        .arrow-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.6);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            z-index: 10;
+        }
+
+        .arrow-btn:hover {
+            background: rgba(0,0,0,0.8);
+        }
+
+        .arrow-left {
+            left: 20px;
+        }
+
+        .arrow-right {
+            right: 20px;
+        }
+
+        .image-counter {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .thumbnail-container {
+            display: flex;
+            gap: 10px;
+            padding: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .thumbnail {
+            width: 80px;
+            height: 80px;
+            border: 3px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .thumbnail.active {
+            border-color: #007bff;
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .info-section {
+            flex: 1;
+            min-width: 400px;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .product-name {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            color: #1a1a1a;
+        }
+
+        .product-description {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .product-price {
+            font-size: 36px;
+            font-weight: 800;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+
+        .product-stock {
+            font-size: 18px;
+            color: #28a745;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .product-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .feature {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #007bff;
+        }
+
+        .feature strong {
+            color: #333;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .feature span {
+            color: #666;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: auto;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+            transform: translateY(-2px);
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-size: 20px;
+            color: #666;
+        }
+
+        .error {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-size: 20px;
+            color: #d32f2f;
+        }
+
+        @media (max-width: 768px) {
+            .product-detail {
+                flex-direction: column;
+            }
+            
+            .image-section, .info-section {
+                min-width: auto;
+            }
+            
+            .info-section {
+                padding: 20px;
+            }
+            
+            .product-name {
+                font-size: 24px;
+            }
+            
+            .product-price {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="loading">Ürün yükleniyor...</div>
+    </div>
+
+    <script>
+        let currentProduct = null;
+        let currentImageIndex = 0;
+
+        // URL'den ürün ID'sini al
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id');
+
+        if (!productId) {
+            document.getElementById('app').innerHTML = '<div class="error">Ürün ID bulunamadı!</div>';
+        } else {
+            loadProduct(productId);
+        }
+
+        async function loadProduct(id) {
+            try {
+                const response = await fetch(`http://localhost:5000/api/products/${id}`);
+                if (!response.ok) {
+                    throw new Error('Ürün bulunamadı');
+                }
+                currentProduct = await response.json();
+                renderProduct();
+            } catch (error) {
+                document.getElementById('app').innerHTML = `<div class="error">Hata: ${error.message}</div>`;
+            }
+        }
+
+        function renderProduct() {
+            if (!currentProduct) return;
+
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                <div class="container">
+                    <div class="product-detail">
+                        <div class="image-section">
+                            <div class="main-image">
+                                ${currentProduct.images && currentProduct.images.length > 0 ? `
+                                    <img src="${currentProduct.images[currentImageIndex]}" alt="${currentProduct.name}" id="mainImage">
+                                    ${currentProduct.images.length > 1 ? `
+                                        <button class="arrow-btn arrow-left" onclick="previousImage()">‹</button>
+                                        <button class="arrow-btn arrow-right" onclick="nextImage()">›</button>
+                                        <div class="image-counter">${currentImageIndex + 1} / ${currentProduct.images.length}</div>
+                                    ` : ''}
+                                ` : '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #888; font-size: 18px;">Resim Yok</div>'}
+                            </div>
+                            ${currentProduct.images && currentProduct.images.length > 1 ? `
+                                <div class="thumbnail-container">
+                                    ${currentProduct.images.map((image, index) => `
+                                        <div class="thumbnail ${index === currentImageIndex ? 'active' : ''}" onclick="setImage(${index})">
+                                            <img src="${image}" alt="Önizleme ${index + 1}">
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="info-section">
+                            <h1 class="product-name">${currentProduct.name}</h1>
+                            <p class="product-description">${currentProduct.description}</p>
+                            <div class="product-price">${currentProduct.price} ₺</div>
+                            <div class="product-stock">Stok: ${currentProduct.stock} adet</div>
+                            <div class="product-features">
+                                ${currentProduct.color ? `<div class="feature"><strong>Renk:</strong><span>${currentProduct.color}</span></div>` : ''}
+                                ${currentProduct.productType ? `<div class="feature"><strong>Ürün Tipi:</strong><span>${currentProduct.productType}</span></div>` : ''}
+                                ${currentProduct.cutType ? `<div class="feature"><strong>Kesim:</strong><span>${currentProduct.cutType}</span></div>` : ''}
+                                ${currentProduct.productionPlace ? `<div class="feature"><strong>Üretim Yeri:</strong><span>${currentProduct.productionPlace}</span></div>` : ''}
+                                ${currentProduct.material ? `<div class="feature"><strong>Materyal:</strong><span>${currentProduct.material}</span></div>` : ''}
+                                ${currentProduct.modelHeight ? `<div class="feature"><strong>Model Boyu:</strong><span>${currentProduct.modelHeight}</span></div>` : ''}
+                                ${currentProduct.modelSize ? `<div class="feature"><strong>Model Bedeni:</strong><span>${currentProduct.modelSize}</span></div>` : ''}
+                                ${currentProduct.sizes && currentProduct.sizes.length > 0 ? `<div class="feature"><strong>Mevcut Bedenler:</strong><span>${currentProduct.sizes.join(', ')}</span></div>` : ''}
+                                ${currentProduct.pattern ? `<div class="feature"><strong>Desen:</strong><span>${currentProduct.pattern}</span></div>` : ''}
+                                ${currentProduct.sustainability ? `<div class="feature"><strong>Sürdürülebilirlik:</strong><span>${currentProduct.sustainability}</span></div>` : ''}
+                                ${currentProduct.sleeveType ? `<div class="feature"><strong>Kol Tipi:</strong><span>${currentProduct.sleeveType}</span></div>` : ''}
+                                ${currentProduct.collarType ? `<div class="feature"><strong>Yaka Tipi:</strong><span>${currentProduct.collarType}</span></div>` : ''}
+                                ${currentProduct.legLength ? `<div class="feature"><strong>Paça Boyu:</strong><span>${currentProduct.legLength}</span></div>` : ''}
+                            </div>
+                            <div class="action-buttons">
+                                <button class="btn btn-primary" onclick="addToCart()">Sepete Ekle</button>
+                                <button class="btn btn-secondary" onclick="goBack()">Geri Dön</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function previousImage() {
+            if (!currentProduct || !currentProduct.images) return;
+            currentImageIndex = currentImageIndex === 0 ? currentProduct.images.length - 1 : currentImageIndex - 1;
+            updateImage();
+        }
+
+        function nextImage() {
+            if (!currentProduct || !currentProduct.images) return;
+            currentImageIndex = currentImageIndex === currentProduct.images.length - 1 ? 0 : currentImageIndex + 1;
+            updateImage();
+        }
+
+        function setImage(index) {
+            if (!currentProduct || !currentProduct.images || index < 0 || index >= currentProduct.images.length) return;
+            currentImageIndex = index;
+            updateImage();
+        }
+
+        function updateImage() {
+            const mainImage = document.getElementById('mainImage');
+            const counter = document.querySelector('.image-counter');
+            const thumbnails = document.querySelectorAll('.thumbnail');
+
+            if (mainImage) {
+                mainImage.src = currentProduct.images[currentImageIndex];
+            }
+
+            if (counter) {
+                counter.textContent = `${currentImageIndex + 1} / ${currentProduct.images.length}`;
+            }
+
+            // Thumbnail'ları güncelle
+            thumbnails.forEach((thumb, index) => {
+                thumb.classList.toggle('active', index === currentImageIndex);
+            });
+        }
+
+        function addToCart() {
+            // Sepete ekleme işlemi - ana sayfaya yönlendir
+            alert('Sepete ekleme özelliği ana sayfada kullanılabilir.');
+            goBack();
+        }
+
+        function goBack() {
+            window.close();
+        }
+
+        // Klavye kısayolları
+        document.addEventListener('keydown', function(e) {
+            if (!currentProduct || !currentProduct.images) return;
+            
+            switch(e.key) {
+                case 'ArrowLeft':
+                    previousImage();
+                    break;
+                case 'ArrowRight':
+                    nextImage();
+                    break;
+                case 'Escape':
+                    goBack();
+                    break;
+            }
+        });
+    </script>
+</body>
+</html> 
