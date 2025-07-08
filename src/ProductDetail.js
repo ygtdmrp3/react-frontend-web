@@ -12,6 +12,8 @@ function ProductDetail() {
     return saved ? JSON.parse(saved) : [];
   });
 
+  const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
   useEffect(() => {
     // URL'den ürün ID'sini al
     const urlParams = new URLSearchParams(window.location.search);
@@ -27,7 +29,7 @@ function ProductDetail() {
 
   const fetchProduct = async (productId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/products/${productId}`);
+      const response = await fetch(`${apiUrl}/api/products/${productId}`);
       if (!response.ok) {
         throw new Error('Ürün bulunamadı');
       }

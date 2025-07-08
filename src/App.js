@@ -242,7 +242,8 @@ function App() {
 
   // Socket.io bağlantısı
   useEffect(() => {
-    const socket = io('http://localhost:5000');
+    const apiUrl = process.env.REACT_APP_API_URL;
+    const socket = io(apiUrl);
     
     socket.on('productsUpdated', () => {
       fetchProducts();
@@ -336,7 +337,7 @@ function App() {
     setUserProductsLoading(true);
     setUserProductsError('');
     try {
-      const res = await fetch('http://localhost:5000/api/products');
+      const res = await fetch(`${apiUrl}/api/products`);
       const data = await res.json();
       if (Array.isArray(data)) {
         setUserProducts(data);
@@ -354,7 +355,7 @@ function App() {
     if (user && user.role === 'admin') {
       setAdminProductsLoading(true);
       try {
-        const res = await fetch('http://localhost:5000/api/products');
+        const res = await fetch(`${apiUrl}/api/products`);
         const data = await res.json();
         setAdminProducts(data);
         setAdminProductsLoading(false);
@@ -481,7 +482,7 @@ function App() {
     setOrdersLoading(true);
     setOrdersError('');
     try {
-      const res = await fetch(`http://localhost:5000/api/my-orders?email=${encodeURIComponent(email)}`);
+      const res = await fetch(`${apiUrl}/api/my-orders?email=${encodeURIComponent(email)}`);
       const data = await res.json();
       if (Array.isArray(data)) {
         setOrders(data);
@@ -499,7 +500,7 @@ function App() {
     setAllOrdersLoading(true);
     setAllOrdersError('');
     try {
-      const res = await fetch('http://localhost:5000/api/orders');
+      const res = await fetch(`${apiUrl}/api/orders`);
       const data = await res.json();
       if (Array.isArray(data)) {
         setAllOrders(data);
@@ -518,7 +519,7 @@ function App() {
     setAdminOrdersLoading(true);
     setAdminOrdersError('');
     try {
-      const res = await fetch('http://localhost:5000/api/orders');
+      const res = await fetch(`${apiUrl}/api/orders`);
       const data = await res.json();
       if (Array.isArray(data)) {
         setAdminOrders(data);
@@ -536,7 +537,7 @@ function App() {
     setUserProductsLoading(true);
     setUserProductsError('');
     try {
-      const res = await fetch('http://localhost:5000/api/products');
+      const res = await fetch(`${apiUrl}/api/products`);
       const data = await res.json();
       if (Array.isArray(data)) {
         setUserProducts(data);
@@ -578,7 +579,7 @@ function App() {
     }
     
     try {
-      const res = await fetch('http://localhost:5000/api/orders', {
+      const res = await fetch(`${apiUrl}/api/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cart, email: user.email, address: addressForm })
@@ -609,7 +610,7 @@ function App() {
       return;
     }
     try {
-      const res = await fetch(`http://localhost:5000/api/products/${editProduct._id}`, {
+      const res = await fetch(`${apiUrl}/api/products/${editProduct._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editProduct)
@@ -632,7 +633,7 @@ function App() {
   const handleDeleteProduct = async (id) => {
     if (!window.confirm('Bu ürünü silmek istediğinizden emin misiniz?')) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/products/${id}`, {
+      const res = await fetch(`${apiUrl}/api/products/${id}`, {
         method: 'DELETE'
       });
       if (!res.ok) {
@@ -757,10 +758,10 @@ function App() {
     }
     
     console.log('İşlenmiş ürün verisi:', processedProduct);
-    console.log('Gönderilecek URL:', `http://localhost:5000/api/products/${editProduct._id}`);
+    console.log('Gönderilecek URL:', `${apiUrl}/api/products/${editProduct._id}`);
     
     try {
-      const res = await fetch(`http://localhost:5000/api/products/${editProduct._id}`, {
+      const res = await fetch(`${apiUrl}/api/products/${editProduct._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(processedProduct)
@@ -835,7 +836,7 @@ function App() {
     e.preventDefault();
     setLoginError('');
     try {
-      const res = await fetch('http://localhost:5000/api/login', {
+      const res = await fetch(`${apiUrl}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: loginEmail, password: loginPassword })
@@ -864,7 +865,7 @@ function App() {
     setRegisterError('');
     setRegisterSuccess('');
     try {
-      const res = await fetch('http://localhost:5000/api/register', {
+      const res = await fetch(`${apiUrl}/api/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: registerEmail, username: registerUsername, password: registerPassword })
@@ -910,7 +911,7 @@ function App() {
       return;
     }
     try {
-      const res = await fetch('http://localhost:5000/api/change-password', {
+      const res = await fetch(`${apiUrl}/api/change-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: user.email, oldPassword, newPassword })
@@ -930,6 +931,7 @@ function App() {
   };
 
   // Cloudinary upload - Çoklu resim desteği
+  const cloudinaryCloudName = process.env.REACT_APP_CLOUDINARY_CLOUD_NAME || 'ddkc67grz';
   const handleImageUpload = async (e) => {
     const files = Array.from(e.target.files);
     
@@ -946,7 +948,7 @@ function App() {
       formData.append('upload_preset', 'ml_default');
       
       try {
-        const res = await fetch('https://api.cloudinary.com/v1_1/ddkc67grz/image/upload', {
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudinaryCloudName}/image/upload`, {
           method: 'POST',
           body: formData
         });
@@ -1045,7 +1047,7 @@ function App() {
     setProductAddMsg('Ürün ekleniyor...');
 
     try {
-      const response = await fetch('http://localhost:5000/api/products', {
+      const response = await fetch(`${apiUrl}/api/products`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1082,7 +1084,7 @@ function App() {
     if (!user) return;
     setSupportLoading(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/support?userEmail=${encodeURIComponent(user.email)}`);
+      const res = await fetch(`${apiUrl}/api/support?userEmail=${encodeURIComponent(user.email)}`);
       const data = await res.json();
       if (Array.isArray(data)) {
         setSupportTickets(data);
@@ -1098,7 +1100,7 @@ function App() {
     if (!user || user.role !== 'admin') return;
     setAdminSupportLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/support');
+      const res = await fetch(`${apiUrl}/api/support`);
       const data = await res.json();
       if (Array.isArray(data)) {
         setAdminSupportTickets(data);
@@ -1151,7 +1153,7 @@ function App() {
         }, 100);
         
         // Sonra backend'e gönder
-        const res = await fetch(`http://localhost:5000/api/support/${activeSupport._id}/user-reply`, {
+        const res = await fetch(`${apiUrl}/api/support/${activeSupport._id}/user-reply`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userReply: messageToSend })
@@ -1179,7 +1181,7 @@ function App() {
         setActiveSupport(newTicket);
         
         // Sonra backend'e gönder
-        const res = await fetch('http://localhost:5000/api/support', {
+        const res = await fetch(`${apiUrl}/api/support`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ orderId: activeSupport.orderId, userEmail: user.email, message: messageToSend })
@@ -1238,7 +1240,7 @@ function App() {
         }, 100);
         
         // Sonra backend'e gönder
-        const res = await fetch(`http://localhost:5000/api/support/${activeAdminSupport._id}/reply`, {
+        const res = await fetch(`${apiUrl}/api/support/${activeAdminSupport._id}/reply`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ adminReply: messageToSend })
@@ -1289,7 +1291,7 @@ function App() {
   // Kategori sistemi fonksiyonları
   const fetchCategories = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/categories');
+      const response = await fetch(`${apiUrl}/api/categories`);
       if (response.ok) {
         const data = await response.json();
         setCategories(data);
@@ -1307,7 +1309,7 @@ function App() {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/categories', {
+      const response = await fetch(`${apiUrl}/api/categories`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1340,7 +1342,7 @@ function App() {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/api/categories/${editCategoryId}`, {
+      const response = await fetch(`${apiUrl}/api/categories/${editCategoryId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1373,7 +1375,7 @@ function App() {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/api/categories/${categoryId}`, {
+      const response = await fetch(`${apiUrl}/api/categories/${categoryId}`, {
         method: 'DELETE'
       });
 
@@ -1413,7 +1415,7 @@ function App() {
     try {
       console.log('Durum güncelleniyor:', orderId, newStatus);
       
-      const res = await fetch(`http://localhost:5000/api/orders/${orderId}/status`, {
+      const res = await fetch(`${apiUrl}/api/orders/${orderId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -1472,6 +1474,10 @@ function App() {
         return '#6c757d'; // Gri
     }
   };
+
+  const googleClientId = process.env.REACT_APP_GOOGLE_CLIENT_ID || '';
+
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   return (
     <div>
@@ -1628,7 +1634,7 @@ function App() {
               </button>
             </div>
             <div style={{ margin: '16px 0', textAlign: 'center' }}>veya</div>
-            <GoogleOAuthProvider clientId="1023975016521-emm88k28b2d0p197bkvj1h8ai6pohb12.apps.googleusercontent.com">
+            <GoogleOAuthProvider clientId={googleClientId}>
               <GoogleLogin
                 onSuccess={handleGoogleLoginSuccess}
                 onError={() => alert('Google ile giriş başarısız!')}
@@ -3831,7 +3837,7 @@ function App() {
               <button 
                 onClick={async () => {
                   try {
-                    const res = await fetch(`http://localhost:5000/api/support/${activeAdminSupport._id}/resolve`, { method: 'PUT' });
+                    const res = await fetch(`${apiUrl}/api/support/${activeAdminSupport._id}/resolve`, { method: 'PUT' });
                     if (res.ok) {
                       const updatedTicket = await res.json();
                       // Aktif destek talebini güncelle (sohbet açık kalır)
@@ -3851,7 +3857,7 @@ function App() {
               <button 
                 onClick={async () => {
                   try {
-                    const res = await fetch(`http://localhost:5000/api/support/${activeAdminSupport._id}/chat-toggle`, { 
+                    const res = await fetch(`${apiUrl}/api/support/${activeAdminSupport._id}/chat-toggle`, { 
                       method: 'PUT',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({ chatOpen: !activeAdminSupport.chatOpen })
